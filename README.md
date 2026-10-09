@@ -1,16 +1,16 @@
 # casus-speelkast
 
 ### Aanpak:
-Functionaliteiten: wat moet de gebruiker allemaal kunnen doen?
-Gegevens: welke informatie moet worden bijgehouden?
-Technische eisen: welke technieken moet ik toepassen.
-ontwerp: welke pagina's en hoe navigeert de gebruiker.
-Technisch ontwerp: ontwerp database, classes, interfaces, methodes en MVC-structuur.
-Implementatie: de applicatie stap voor stap bouwen en testen.
+- Functionaliteiten: wat moet de gebruiker allemaal kunnen doen?
+- Gegevens: welke informatie moet worden bijgehouden?
+- Technische eisen: welke technieken moet ik toepassen.
+- ontwerp: welke pagina's en hoe navigeert de gebruiker.
+- Technisch ontwerp: ontwerp database, classes, interfaces, methodes en MVC-structuur.
+- Implementatie: de applicatie stap voor stap bouwen en testen.
 
-Vervolg: nadat de eerste opzet is uitgewerkt, een concreet stappenplan maken voor de implementatie. Hierin bepalen met welk onderdeel ik begin en in welke volgorde ik de functionaliteiten ga bouwen.
+- Vervolg: nadat de eerste opzet is uitgewerkt, een concreet stappenplan maken voor de implementatie. Hierin bepalen met welk onderdeel ik begin en in welke volgorde ik de functionaliteiten ga bouwen.
 
-extra: Opmaak. (Wil eerst focussen zodat de backend+werking goed werkt.)
+- extra: Opmaak. (Wil eerst focussen zodat de backend+werking goed werkt.)
 
 
 ## Functionaliteiten
