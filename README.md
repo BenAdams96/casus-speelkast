@@ -28,7 +28,7 @@
 - uitbreiding: titel, eigenaar, foto, bij welk basisspel deze hoort (misschien even kijken of dit dan niet bij bordspel zelf hoort)
 
 ## Technische eisen
-- MySQL met PDO en prepared statements
+- MySQL met PDO en prepared statements (via MyPHPadmin)
 - session voor login en logout
 - OOP: abstracte class, subclass, interfaces
 - MVC toepassen (meer uitgebreid checken hoe)
@@ -37,10 +37,20 @@
 - .env voor makkelijke configuratie
 
 ## Ontwerp
+- welke paginas zijn nodig
+- hoe tussen pagina's navigeren
+- eenvoudige schets pagina (MVP)
 
 ## Technisch ontwerp
+- database structuur
+- classes + interfaces bedenken
+- methodes bepalen
+- MVC verdeling
 
 ## Implementatie
-
+- beginnen met MVC verdeling
+- Interfaces bepalen
+- Classes en Subclasses bepalen
+- stap voor stap uitbreiden
 
 
