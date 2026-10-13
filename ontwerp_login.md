@@ -1,75 +1,61 @@
-# Login pagina
+# Login en logout
 
 ### User Story – Inloggen
-
 **Als gebruiker** wil ik kunnen inloggen met mijn gebruikersnaam en wachtwoord, zodat ik toegang krijg tot de Speelkast.
 
 **Acceptatiecriteria:**
-- De gebruiker kan een gebruikersnaam en wachtwoord invoeren.
-- De gebruiker kan op een knop klikken om in te loggen.
-- Bij correcte inloggegevens wordt de gebruiker doorgestuurd naar de Speelkast.
-- Bij onjuiste inloggegevens verschijnt een foutmelding.
-- Bij lege invoervelden verschijnt een foutmelding.
-
-**Technische eisen:**
-- Gebruikersgegevens worden opgeslagen in MySQL.
-- Wachtwoorden worden opgeslagen als hash.
-- PDO met prepared statements voor het ophalen van gebruikersgegevens.
-- `password_verify()` voor wachtwoordcontrole.
-- `$_SESSION` om de gebruiker ingelogd te houden.
-- Databasegegevens via configuratie (`.env` of configuratiebestand). (later)
+- Inloggen met gebruikersnaam en wachtwoord.
+- Bij correcte gegevens doorsturen naar `speelkast.php`.
+- Bij onjuiste gegevens een foutmelding tonen.
+- Alleen ingelogde gebruikers kunnen de Speelkast bekijken.
+- Gebruiker kan uitloggen.
 
 ### View
-**login.php**
-- invoerveld voor gebruikersnaam (text)
-- invoerveld voor wachtwoord (password)
-- knop om in te loggen
-- eventuele foutmelding tonen
-- formulier verstuurt gegevens via POST
+**`views/login_view.php`**
+- Formulier met gebruikersnaam en wachtwoord.
+- Versturen via POST.
+- Eventuele foutmelding tonen.
+
+**`views/speelkast_view.php`**
+- Uitlogknop via POST.
 
 ### Controller
-**AuthController.php**
-Verwerkt het loginverzoek:
-- ontvangt POST met gebruikersnaam en wachtwoord
-- controleert of beide velden zijn ingevuld
-- vraagt gebruikersgegevens op bij het Model
-- controleert het ingevoerde wachtwoord met `password_verify()`
-- bij succesvolle login: slaat gebruikersgegevens (id en gebruikersnaam) op in `$_SESSION`
-- verwijst gebruiker door naar de Speelkast-pagina
-- bij mislukte login: toont foutmelding via de View
+**`controllers/AuthController.php`**
 
-**Methodes (voorlopig):**
-- `login()`
-- `logout()`
+Verwerkt het inloggen en uitloggen.
+
+**Methodes:**
+- `login()` – controleert POST, haalt gebruiker op via `UserManager`, vergelijkt wachtwoord en slaat `user_id` op in `$_SESSION`. Bij succes redirect naar `speelkast.php`, anders foutmelding tonen via de View.
+- `logout()` – controleert of via POST is uitgelogd, vernietigt de session en verwijst terug naar `index.php`.
 
 ### Model
-
-**DBConnect.php**
-- maakt verbinding met MySQL via PDO
-- gebruikt databasegegevens uit configuratie
-- handelt eventuele verbindingsfouten af met try/catch
-- geeft de PDO-verbinding door aan andere classes
+**`models/UserManager.php`**
+- Ontvangt PDO via de constructor (dependency injection).
+- Zoekt gebruiker op via een prepared statement.
 
 **Methodes:**
-- `getConnection()` – geeft de PDO-verbinding terug
+- `__construct($pdo)`
+- `getUser($username)` – haalt gebruiker op uit MySQL.
 
-**User.php**
-- ontvangt de PDO-verbinding via de constructor (dependency injection)
-- zoekt gebruiker op in MySQL met prepared statement
-- geeft de gevonden gebruikersgegevens terug (of geen resultaat)
+### Databaseverbinding
+**`database/DBConnect.php`**
+- Maakt verbinding met MySQL via PDO.
+- Gebruikt try/catch voor verbindingsfouten.
+- `getInstance()` – geeft de PDO-verbinding terug.
 
-**Methodes:**
-- `__construct($db_handle)` – ontvangt de databaseverbinding
-- `findByUsername($username)` – zoekt gebruiker op basis van gebruikersnaam
+### Startpagina's
+- `index.php` – start session, maakt benodigde objecten en roept `login()` aan.
+- `speelkast.php` – controleert de session, verwerkt eventueel uitloggen en toont de Speelkast.
 
 ### Database
+**MySQL – tabel `user`**
 
-**MySQL – tabel users**
+| Kolom | Type |
+|---|---|
+| id | INT, PRIMARY KEY, AUTO_INCREMENT |
+| username | VARCHAR |
+| password | VARCHAR |
 
-| Kolom | Type | Beschrijving |
-|---|---|---|
-| id | INT, PRIMARY KEY, AUTO_INCREMENT | uniek gebruikers-ID |
-| username | VARCHAR(100), UNIQUE | gebruikersnaam |
-| password_hash | VARCHAR(255) | gehasht wachtwoord |
-
-Database en tabel aanmaken via phpMyAdmin.
+**Nog aanpassen:**
+- Wachtwoorden hashen en controleren met `password_verify()`.
+- Databasegegevens naar een configuratiebestand verplaatsen.
