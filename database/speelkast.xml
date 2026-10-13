@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<speelkast>
+    <item type="bordspel">
+        <titel>Ganzenbord</titel>
+        <eigenaar>Ben</eigenaar>
+        <filename>upload/Ganzenbord.jpg</filename>
+        <min_spelers>2</min_spelers>
+        <max_spelers>4</max_spelers>
+    </item>
+
+    <item type="bordspel">
+        <titel>Mens erger je niet</titel>
+        <eigenaar>Ben</eigenaar>
+        <filename>upload/MensErgerJeNiet.jpg</filename>
+        <min_spelers>2</min_spelers>
+        <max_spelers>4</max_spelers>
+    </item>
+</speelkast>

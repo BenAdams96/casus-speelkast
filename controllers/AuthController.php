@@ -1,40 +1,57 @@
 <?php
 
-class AuthController {
+class AuthController
+{
+    private UserManager $usermanager;
 
-    private UserManager $user;
-
-    public function __construct(UserManager $user) {
-        $this->user = $user;
+    public function __construct(UserManager $usermanager)
+    {
+        $this->usermanager = $usermanager;
     }
 
-    public function login() {
-
+    /**
+     * Verwerkt de login en toont het loginformulier.
+     */
+    public function login()
+    {
         $error = "";
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST" &&
-            isset($_POST["username"], $_POST["password"])) {
+        if (
+            $_SERVER["REQUEST_METHOD"] === "POST" &&
+            isset($_POST["username"], $_POST["password"])
+        ) {
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+
+            //gebruiker ophalen uit model
+            $user = $this->usermanager->getUser($username);
+            //$user is: array(3) { ["id"]=> int(1) ["username"]=> string(3) "ben" ["password"]=> string(4) "test" }
+            
+            //wachtwoord controleren
+            //TODO: add hash
+            if ($user && $password === $user["password"]) {
+                $_SESSION["user_id"] = $user["id"]; // use id since people can have same name (not implemented yet)
+
+                header("Location: speelkast.php");
                 
-                $username = $_POST["username"];
-                $password = $_POST["password"];
+                exit;
+            } //else toevoegen
 
-                //gebruiker ophalen uit model
-                $user = $this->user->getUser($username);
+            $error = "Ongeldige gebruikersnaam of wachtwoord.";
+        }
 
-                //wachtwoord controleren
-                //TODO: add hash
-                if ($user && $password === $user["password"]) {
-
-                    $_SESSION["user_id"] = $user["id"];
-
-                    header("Location: views/speelkast.php");
-                    exit;
-                }
-
-                $error = "Ongeldige gebruikersnaam of wachtwoord.";
-            } //else toevoegen als verkeerde log in is
-
-        require "views/login.php"; //require verschilt van header, doet geen Request sturen.
-        exit; //na require wordt anders de rest van de code nog doorgevoerd. (is hier laatste stap dus niet noodzakelijk, wel netjes)
+        //loginformulier tonen als er geen login is
+         require "views/login_view.php";
     }
+
+    //uitloggen
+    public function logout()
+    {
+        if (isset($_POST["logout"])) {
+            session_destroy();
+            header("Location: index.php");
+            exit;
+        }
+    }
+
 }
