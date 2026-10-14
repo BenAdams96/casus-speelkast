@@ -7,8 +7,8 @@ require "models/UserManager.php";
 require "controllers/AuthController.php";
 
 $pdo = DBConnect::getInstance(); //DB connectie
-$user = new UserManager($pdo); //Model (PDO DI injection)
-$auth = new AuthController($user); //Controller
+$usermanager = new UserManager($pdo); //Model (PDO DI injection)
+$auth = new AuthController($usermanager); //Controller
 
 $auth->login();
 

@@ -1,16 +1,23 @@
 
 <?php
-require_once __DIR__ . "../interfaces/InterfaceFoto.php";
+require_once __DIR__ . "/../interfaces/InterfaceFoto.php";
+require_once __DIR__ . "/enums/ItemType.php"; //nieuwe enum gemaakt voor de itemtype, want waarom niet
 
 abstract class KastItem implements InterfaceFoto
 {
     protected string $titel;
-    protected string $eigenaar;
+    protected string $username; //zelfde als eigenaar
+    protected string $imagePath;
+    protected ?int $minSpelers; // quesstion mark omdat deze NULL kunnen zijn uitbreiding
+    protected ?int $maxSpelers; // dan overnemen van het basisspel
 
-    public function __construct($titel, $eigenaar)
+    public function __construct($titel, $username, $imagePath, $minSpelers, $maxSpelers)
     {
         $this->titel = $titel;
-        $this->eigenaar = $eigenaar;
+        $this->username = $username;
+        $this->imagePath = $imagePath;
+        $this->minSpelers = $minSpelers;
+        $this->maxSpelers = $maxSpelers;
     }
 
     public function getTitel()
@@ -18,10 +25,40 @@ abstract class KastItem implements InterfaceFoto
         return $this->titel;
     }
 
-    public function getEigenaar()
+    public function getUsername() //beschouw username en eigenaar als hetzelfde
     {
-        return $this->eigenaar;
+        return $this->username;
     }
 
-    //TODO: verder uitbreiden, voor nu is dit genoeg om te testen
+    public function getImagePath()
+    {
+        return $this->imagePath;
+    }
+
+    public function getMinSpelers()
+    {
+        return $this->minSpelers;
+    }
+
+    public function getMaxSpelers()
+    {
+        return $this->maxSpelers;
+    }
+
+    abstract public function getType(): ItemType;
+
+    //methodes van InterfaceFoto
+    public function checkFileName()
+    {
+        $extension = strtolower(pathinfo($this->imagePath, PATHINFO_EXTENSION));
+        return in_array($extension, ["jpg", "png", "gif"]);
+    }
+
+    public function showImage()
+    {
+        return '<img src="' . htmlspecialchars($this->imagePath) . '" width="150">';
+    }
+
+    //iedere subclass maakt een eigen omschrijving
+    abstract public function omschrijving();
 }
