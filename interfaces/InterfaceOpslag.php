@@ -1,4 +1,4 @@
 <?php
 interface InterfaceOpslag {
-    public function saveFile($file);
+    public function saveFile(array $file): string;
 }

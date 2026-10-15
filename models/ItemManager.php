@@ -13,66 +13,51 @@ class ItemManager
         $this->pdo = $pdo;
     }
 
+    public function createItem(array $data): KastItem
+    {
+        $username = $data["username"] ?? "";
+        if ($data["type"] === ItemType::BORDSPEL->value) {
+            return new BoardGame(
+                $data["titel"],
+                $data["username"],
+                $data["image_path"],
+                $data["min_spelers"],
+                $data["max_spelers"]
+            );
+        }
+
+        if ($data["type"] === ItemType::UITBREIDING->value) {
+            return new Expansion(
+                $data["titel"],
+                $data["username"],
+                $data["image_path"],
+                $data["min_spelers"],
+                $data["max_spelers"],
+                $data["basisspel"]
+            );
+        }
+
+        throw new InvalidArgumentException("Ongeldig speltype.");
+    }
+
     public function getAllItems()
     {
         $stmt = $this->pdo->query(
             "SELECT items.*, user.username
-             FROM items
-             JOIN user ON items.user_id = user.id"
+         FROM items
+         JOIN user ON items.user_id = user.id"
         );
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $items = [];
-        $basisspellen = [];
-
-        //eerst de basisspellen verzamelen
-        foreach ($rows as $row) {
-            if ($row["type"] === ItemType::BORDSPEL->value) {
-                $basisspellen[$row["titel"]] = $row;
-            }
-        }
 
         //iedere database-rij omzetten naar een object
         foreach ($rows as $row) {
-
-            if ($row["type"] === ItemType::BORDSPEL->value) {
-                $item = new BoardGame(
-                    $row["titel"],
-                    $row["username"],
-                    $row["image_path"],
-                    $row["min_spelers"],
-                    $row["max_spelers"]
-                );
-
-            } elseif ($row["type"] === ItemType::UITBREIDING->value) {
-
-                //bijbehorend basisspel zoeken
-                $basis = $basisspellen[$row["basisspel"]] ?? null;
-
-                //eigen spelersaantallen gebruiken, anders die van basisspel
-                $minSpelers = $row["min_spelers"] ?? ($basis["min_spelers"] ?? null);
-                $maxSpelers = $row["max_spelers"] ?? ($basis["max_spelers"] ?? null);
-                //TODO: checken hoe dit netter kan!
-
-                $item = new Expansion(
-                    $row["titel"],
-                    $row["username"],
-                    $row["image_path"],
-                    $minSpelers,
-                    $maxSpelers,
-                    $row["basisspel"]
-                );
-
-            } else {
-                continue;
-            }
-
-            $items[] = $item;
+            $items[] = $this->createItem($row);
         }
 
         return $items;
     }
-
 
     public function addItem(KastItem $item, int $userId)
     {

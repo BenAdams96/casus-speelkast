@@ -12,7 +12,7 @@ class DBConnect {
             );
 
         } catch (PDOException $error) {
-            echo $error->getMessage();
+            die("Databaseverbinding mislukt: " . $error->getMessage());
         }
     }
     public static function getInstance() { //makes it kind of a singleton
