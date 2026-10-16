@@ -31,6 +31,7 @@ class AuthController
             //TODO: add hash
             if ($user && $password === $user["password"]) {
                 $_SESSION["user_id"] = $user["id"];
+                $_SESSION["username"] = $user["username"];
 
                 header("Location: speelkast.php");
                 exit;

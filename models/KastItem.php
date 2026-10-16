@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . "/../interfaces/InterfaceFoto.php";
 require_once __DIR__ . "/enums/ItemType.php"; //nieuwe enum gemaakt voor de itemtype, want waarom niet

@@ -11,8 +11,8 @@
     <div>
         <form method="POST">
             <button type="button" onclick="window.location.href='toevoegen.php'">Toevoegen</button>
-            <button type="submit" name="Exporteren">Exporteren</button>
-            <button type="submit" name="Avondlijst">Avondlijst</button>
+            <button type="button" onclick="window.location.href='export.php'">Exporteren</button>
+            <button type="button" onclick="window.location.href='avondlijst.php'"> Avondlijst </button>
             <button type="submit" name="logout">Uitloggen</button>
         </form>
     </div>
@@ -23,6 +23,7 @@
             <p>Eigenaar: <?= htmlspecialchars($item->getUsername()) ?></p>
             <p>Type: <?= htmlspecialchars($item->getType()->value) ?></p>
             <p><?= htmlspecialchars($item->omschrijving()) ?></p>
+            <p><?= $item->showImage() ?></p>
             <!--$item->showImage() image nog toevoegen-->
         <?php endforeach; ?>
     </div>

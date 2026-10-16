@@ -1,0 +1,60 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- AI generated, geen ervaring met XSD -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="speelkast">
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element name="item" maxOccurs="unbounded" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+
+                            <!-- Type: alleen bordspel of uitbreiding -->
+                            <xs:element name="type">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="bordspel"/>
+                                        <xs:enumeration value="uitbreiding"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+                            <!-- Titel is verplicht en mag niet leeg zijn -->
+                            <xs:element name="titel">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:token">
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+                            <!-- Eigenaar -->
+                            <xs:element name="eigenaar" type="xs:string"/>
+
+                            <!-- Fotopad is verplicht -->
+                            <xs:element name="foto">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:token">
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+
+                            <!-- Extra gegevens bordspel -->
+                            <xs:element name="min_spelers" type="xs:positiveInteger" minOccurs="0"/>
+                            <xs:element name="max_spelers" type="xs:positiveInteger" minOccurs="0"/>
+
+                            <!-- Extra gegevens uitbreiding -->
+                            <xs:element name="basisspel" type="xs:string" minOccurs="0"/>
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -15,7 +15,6 @@ class ItemManager
 
     public function createItem(array $data): KastItem
     {
-        $username = $data["username"] ?? "";
         if ($data["type"] === ItemType::BORDSPEL->value) {
             return new BoardGame(
                 $data["titel"],

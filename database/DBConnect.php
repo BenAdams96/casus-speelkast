@@ -23,5 +23,3 @@ class DBConnect {
         return DBConnect::$db->dbh;
     }
 }
-
-?>

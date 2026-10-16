@@ -16,12 +16,12 @@ class Expansion extends KastItem
         return ItemType::UITBREIDING;
     }
 
-    public function getBasisspel()
+    public function getBasisspel() : string
     {
         return $this->basisspel;
     }
 
-    public function omschrijving()
+    public function omschrijving() : string
     {
         return "$this->titel - uitbreiding voor $this->basisspel ($this->minSpelers tot $this->maxSpelers spelers)";
     } //nog verder uitbreiden maar voor nu is dit genoeg om mee te testen
