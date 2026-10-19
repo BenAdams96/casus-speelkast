@@ -1,25 +1,37 @@
 <?php
 
-class DBConnect {
-    static $db; //static betekent dat variabele bij de class zelf hoort, niet het object.
-    private $dbh; //hier word het PDO object in opgeslagen
-    private function __construct() {
-        try { //try to get PDO connection
+class DBConnect
+{
+    private static ?DBConnect $db = null;
+    private PDO $dbh;
+
+    private function __construct()
+    {
+        //databasegegevens uit .env lezen
+        $env = parse_ini_file(__DIR__ . "/../.env");
+
+        if ($env === false) {
+            die(".env niet gevonden");
+        }
+
+        try {
             $this->dbh = new PDO(
-                "mysql:host=localhost;dbname=speelkast",
-                "root",
-                ""
+                "mysql:host={$env['DB_HOST']};dbname={$env['DB_NAME']}",
+                $env["DB_USER"],
+                $env["DB_PASSWORD"]
             );
 
         } catch (PDOException $error) {
             die("Databaseverbinding mislukt: " . $error->getMessage());
         }
     }
-    public static function getInstance() { //makes it kind of a singleton
-        if (!isset(DBConnect::$db)) { //if not existing, create it.
-            DBConnect::$db = new DBConnect(); //:: om iets direct via de class aan te spreken, ipv via een instantie
+
+    public static function getInstance(): PDO
+    {
+        if (self::$db === null) {
+            self::$db = new DBConnect();
         }
 
-        return DBConnect::$db->dbh;
+        return self::$db->dbh;
     }
 }

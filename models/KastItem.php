@@ -47,13 +47,13 @@ abstract class KastItem implements InterfaceFoto
     abstract public function getType(): ItemType;
 
     //methodes van InterfaceFoto
-    public function checkFileName()
+    public function checkFileName(): bool
     {
         $extension = strtolower(pathinfo($this->imagePath, PATHINFO_EXTENSION));
         return in_array($extension, ["jpg", "png", "gif"]);
     }
 
-    public function showImage()
+    public function showImage(): string
     {
         return '<img src="' . htmlspecialchars($this->imagePath) . '" width="150">';
     }

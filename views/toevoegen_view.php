@@ -61,6 +61,7 @@ require_once "models/enums/ItemType.php";
 
         <label for="foto">Foto:</label>
         <input type="file" name="foto" id="foto" accept="image/jpeg,image/png,image/gif" required>
+        <span id="foto_error" style="color: red;"></span>
 
         <br><br>
 

@@ -131,10 +131,25 @@ class SpeelkastController
         $exporter = new XmlExporter();
         $xml = $exporter->createXml($items);
 
-        //XML tonen in de browser
-        header("Content-Type: application/xml; charset=UTF-8");
-        echo $xml;
+        //XML netjes opmaken
+        $dom = new DOMDocument();
+        $dom->formatOutput = true;
+        $dom->loadXML($xml);
+        $xml = $dom->saveXML();
+
+        //XML downloaden als op download is geklikt
+        if (isset($_GET["download"])) {
+            header("Content-Type: application/xml; charset=UTF-8");
+            header('Content-Disposition: attachment; filename="speelkast.xml"');
+
+            echo $xml;
+            exit;
+        }
+
+        //anders de exportpagina tonen
+        require "views/export_view.php";
     }
+
 
 
     public function showAvondlijst()
@@ -144,6 +159,9 @@ class SpeelkastController
 
         $exporter = new XmlExporter();
         $xml = $exporter->createXml($items);
+
+        //tijdelijk testen met ongeldig speltype
+        // $xml = str_replace("<type>bordspel</type>", "<type>ongeldig</type>", $xml);
 
         //XML-string laden in DOMDocument
         $dom = new DOMDocument();

@@ -20,5 +20,7 @@
         <button type="submit">Inloggen</button>
     </form>
 
+    <p>Nog geen account? <a href="registreren.php">Registreer hier</a></p>
+
 </body>
 </html>

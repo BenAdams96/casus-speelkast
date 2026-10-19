@@ -40,6 +40,7 @@
 
             <body>
                 <h1>Speelkast - Avondlijst</h1>
+                <a href="speelkast.php">Terug naar Speelkast</a>
                 <p>
                     <xsl:value-of select="$validatie"/>
                 </p>

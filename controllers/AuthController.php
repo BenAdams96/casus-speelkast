@@ -29,7 +29,9 @@ class AuthController
 
             //wachtwoord controleren
             //TODO: add hash
-            if ($user && $password === $user["password"]) {
+            if ($user && password_verify($password, $user["password"])) {
+                session_regenerate_id(true);
+
                 $_SESSION["user_id"] = $user["id"];
                 $_SESSION["username"] = $user["username"];
 
@@ -42,6 +44,27 @@ class AuthController
 
         //loginformulier tonen
         require "views/login_view.php";
+    }
+
+    public function register(): void
+    {
+        $error = "";
+
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $username = trim($_POST["username"] ?? "");
+            $password = $_POST["password"] ?? "";
+
+            if ($username !== "" && $password !== "") {
+                $this->usermanager->registerUser($username, $password);
+
+                header("Location: index.php");
+                exit;
+            }
+
+            $error = "Vul alle velden in.";
+        }
+
+        require __DIR__ . "/../views/registreren_view.php";
     }
 
     //uitloggen
