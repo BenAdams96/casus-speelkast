@@ -73,20 +73,12 @@
                             </td>
 
                             <td>
-                                <!-- Informatie voor bordspellen -->
-                                <xsl:if test="type = 'bordspel'">
-                                    <xsl:if test="min_spelers and max_spelers">
-                                        <xsl:value-of select="min_spelers"/>
-                                        -
-                                        <xsl:value-of select="max_spelers"/>
-                                        spelers
-                                    </xsl:if>
-                                </xsl:if>
+                                <xsl:value-of select="omschrijving"/>
 
-                                <!-- Informatie voor uitbreidingen -->
-                                <xsl:if test="type = 'uitbreiding'">
-                                    Basisspel:
-                                    <xsl:value-of select="basisspel"/>
+                                <xsl:if test="type = 'uitbreiding' and basisspel_bestaat = 'nee'">
+                                    <p style="color: red;">
+                                        Let op: het basisspel staat niet in de Speelkast.
+                                    </p>
                                 </xsl:if>
                             </td>
                         </tr>

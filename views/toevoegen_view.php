@@ -38,10 +38,27 @@ require_once "models/enums/ItemType.php";
 
         <label id="basisspelVeld_box" hidden>
             Basisspel:
-            <input type="text" name="basisspel" id="basisspelVeld"
-                value="<?= htmlspecialchars($_POST["basisspel"] ?? "") ?>">
+
+            <select name="basisspel" id="basisspelVeld">
+                <option value="">Kies een basisspel</option>
+
+                <?php foreach ($items as $item): ?>
+                    <?php if ($item instanceof BoardGame): ?>
+                        <option value="<?= htmlspecialchars($item->getTitel()) ?>" <?= ($_POST["basisspel"] ?? "") === $item->getTitel() ? "selected" : "" ?>>
+                            <?= htmlspecialchars($item->getTitel()) ?>
+                        </option>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+
+                <option value="Basisspel niet aanwezig" <?= ($_POST["basisspel"] ?? "") === "Basisspel niet aanwezig" ? "selected" : "" ?>>
+                    Basisspel niet aanwezig
+                </option>
+            </select>
+
             <span id="basisspelVeld_error" style="color: red;"></span>
         </label>
+
+
 
         <br><br>
 
@@ -126,7 +143,7 @@ require_once "models/enums/ItemType.php";
             }
         }
 
-        
+
 
 
 

@@ -55,7 +55,7 @@ abstract class KastItem implements InterfaceFoto
 
     public function showImage(): string
     {
-        return '<img src="' . htmlspecialchars($this->imagePath) . '" width="150">';
+        return '<img src="' . htmlspecialchars($this->imagePath) . '" width="120">';
     }
 
     //iedere subclass maakt een eigen omschrijving

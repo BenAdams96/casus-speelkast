@@ -41,7 +41,7 @@ class SpeelkastController
                 $error = $e->getMessage();
             }
         }
-
+        $items = $this->itemManager->getAllItems();
         require "views/toevoegen_view.php";
     }
 

@@ -26,7 +26,21 @@ class XmlExporter
             //extra gegevens voor uitbreidingen
             if ($item instanceof Expansion) {
                 $spel->addChild("basisspel", htmlspecialchars($item->getBasisspel(), ENT_XML1, "UTF-8"));
+
+                $has_basegame = false;
+
+                foreach ($items as $otherItem) {
+                    if ($otherItem instanceof BoardGame &&
+                        //check of twee strings gelijk zijn, eerst trim, en dan namen vergelijken, zo checken of er basegame is
+                        strcasecmp(trim($otherItem->getTitel()), trim($item->getBasisspel())) === 0)
+                        {
+                        $has_basegame = true;
+                        break;
+                    }
+                }
             }
+
+            $spel->addChild("omschrijving", htmlspecialchars($item->omschrijving(), ENT_XML1, "UTF-8"));
         }
 
         return $xml->asXML();

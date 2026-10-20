@@ -47,6 +47,8 @@
 
                             <!-- Extra gegevens uitbreiding -->
                             <xs:element name="basisspel" type="xs:string" minOccurs="0"/>
+                            <xs:element name="basisspel_bestaat" type="xs:string" minOccurs="0"/>
+                            <xs:element name="omschrijving" type="xs:string"/>
 
                         </xs:sequence>
                     </xs:complexType>
