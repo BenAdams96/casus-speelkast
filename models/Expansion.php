@@ -16,15 +16,17 @@ class Expansion extends KastItem
         return ItemType::UITBREIDING;
     }
 
-    public function getBasisspel() : string
+    public function getBasisspel(): string
     {
         return $this->basisspel;
     }
 
-    public function omschrijving() : string
+    public function omschrijving(): string
     {
-        return "$this->titel - uitbreiding voor $this->basisspel ($this->minSpelers tot $this->maxSpelers spelers)";
+        if ($this->basisspel === "Basisspel niet aanwezig") {
+            return "$this->titel is een uitbreiding ($this->minSpelers tot $this->maxSpelers spelers)";
+        }
 
-        
-    } //nog verder uitbreiden maar voor nu is dit genoeg om mee te testen
+        return "$this->titel - uitbreiding voor $this->basisspel ($this->minSpelers tot $this->maxSpelers spelers)";
+    }
 }
