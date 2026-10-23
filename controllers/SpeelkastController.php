@@ -54,6 +54,10 @@ class SpeelkastController
         $titel = trim($_POST["titel"] ?? "");
         $basisspel = trim($_POST["basisspel"] ?? "");
 
+        //zelf ingevuld basisspel gebruiken
+        if ($basisspel === "Basisspel niet aanwezig") {
+            $basisspel = trim($_POST["nieuw_basisspel"] ?? "");
+        }
         $minSpelers = $_POST["min_spelers"] ?? "";
         $maxSpelers = $_POST["max_spelers"] ?? "";
 

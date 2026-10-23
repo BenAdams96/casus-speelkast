@@ -1,55 +1,35 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- AI generated, geen ervaring met XSLT -->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     version="1.0">
 
+    <!-- AI generated, geen ervaring met XSLT -->
+
     <xsl:output method="html" encoding="UTF-8" indent="yes"/>
     <xsl:param name="validatie"/>
-    <xsl:template match="/">
 
+    <xsl:template match="/">
         <html>
             <head>
                 <title>Speelkast Avondlijst</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 30px;
-                    }
-
-                    table {
-                        border-collapse: collapse;
-                        width: 100%;
-                    }
-
-                    th, td {
-                        border: 1px solid #ccc;
-                        padding: 10px;
-                        text-align: left;
-                    }
-
-                    th {
-                        background-color: #eee;
-                    }
-
-                    img {
-                        width: 100px;
-                    }
-                </style>
+                <link rel="stylesheet" href="css/style.css"/>
             </head>
 
             <body>
                 <h1>Speelkast - Avondlijst</h1>
+
                 <a href="speelkast.php">Terug naar Speelkast</a>
+
                 <p>
                     <xsl:value-of select="$validatie"/>
                 </p>
+
                 <table>
                     <tr>
                         <th>Foto</th>
                         <th>Titel</th>
                         <th>Type</th>
                         <th>Eigenaar</th>
+                        <th>Aantal spelers</th>
                         <th>Extra informatie</th>
                     </tr>
 
@@ -72,9 +52,26 @@
                                 <xsl:value-of select="eigenaar"/>
                             </td>
 
+                            <!-- Aantal spelers -->
+                            <td>
+                                <xsl:choose>
+                                    <xsl:when test="min_spelers and max_spelers">
+                                        <xsl:value-of select="min_spelers"/>
+                                        tot
+                                        <xsl:value-of select="max_spelers"/>
+                                    </xsl:when>
+
+                                    <xsl:otherwise>
+                                        Onbekend
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </td>
+
+                            <!-- Extra informatie -->
                             <td>
                                 <xsl:value-of select="omschrijving"/>
 
+                                <!-- Waarschuwing ontbrekend basisspel -->
                                 <xsl:if test="type = 'uitbreiding' and basisspel_bestaat = 'nee'">
                                     <p style="color: red;">
                                         Let op: het basisspel staat niet in de Speelkast.
@@ -87,6 +84,5 @@
                 </table>
             </body>
         </html>
-
     </xsl:template>
 </xsl:stylesheet>

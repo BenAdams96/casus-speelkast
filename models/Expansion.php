@@ -1,4 +1,6 @@
+
 <?php
+
 require_once __DIR__ . "/KastItem.php";
 
 class Expansion extends KastItem
@@ -8,7 +10,7 @@ class Expansion extends KastItem
     public function __construct($titel, $username, $imagePath, $minSpelers, $maxSpelers, $basisspel)
     {
         parent::__construct($titel, $username, $imagePath, $minSpelers, $maxSpelers);
-        $this->basisspel = $basisspel; //omdat alleen basisspel extra is vergeleken met KastItem
+        $this->basisspel = $basisspel;
     }
 
     public function getType(): ItemType
@@ -23,10 +25,6 @@ class Expansion extends KastItem
 
     public function omschrijving(): string
     {
-        if ($this->basisspel === "Basisspel niet aanwezig") {
-            return "$this->titel is een uitbreiding ($this->minSpelers tot $this->maxSpelers spelers)";
-        }
-
-        return "$this->titel - uitbreiding voor $this->basisspel ($this->minSpelers tot $this->maxSpelers spelers)";
+        return "Dit spel is een uitbreiding van $this->basisspel.";
     }
 }
