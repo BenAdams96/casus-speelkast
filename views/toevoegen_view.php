@@ -132,12 +132,14 @@ require_once "models/enums/ItemType.php";
         const titel_field = getElement("titel");
         const min_spelers_field = getElement("min_spelers");
         const max_spelers_field = getElement("max_spelers");
+        const foto_field = getElement("foto");
 
         const titel_error = getElement("titel_error");
         const basisspelVeld_error = getElement("basisspelVeld_error");
         const nieuwBasisspel_error = getElement("nieuwBasisspel_error");
         const min_spelers_error = getElement("min_spelers_error");
         const max_spelers_error = getElement("max_spelers_error");
+        const foto_error = getElement("foto_error");
 
         //basisspelvelden tonen of verbergen
         function updateBasisspel() {
@@ -156,54 +158,92 @@ require_once "models/enums/ItemType.php";
         updateBasisspel();
 
         //validatie titel
-        titel_field.addEventListener("change", function () {
+        titel_field.addEventListener("change", checkTitel);
+
+        function checkTitel() {
             titel_error.textContent =
                 titel_field.value.trim() === "" ? "Vul een titel in." : "";
-        });
+        }
 
         //validatie basisspel
-        basisspelVeld_field.addEventListener("change", function () {
+        basisspelVeld_field.addEventListener("change", checkBasisspel);
+
+        function checkBasisspel() {
             basisspelVeld_error.textContent =
-                basisspelVeld_field.value === "" ? "Kies een basisspel." : "";
-        });
+                type.value === "uitbreiding" && basisspelVeld_field.value.trim() === "" ?
+                "Kies een basisspel." : "";
+        }
 
         //validatie zelf ingevuld basisspel
-        nieuwBasisspel_field.addEventListener("change", function () {
+        nieuwBasisspel_field.addEventListener("change", checkNieuwBasisspel);
+
+        function checkNieuwBasisspel() {
             nieuwBasisspel_error.textContent =
+                type.value === "uitbreiding" &&
+                basisspelVeld_field.value === "Basisspel niet aanwezig" &&
                 nieuwBasisspel_field.value.trim() === "" ?
                 "Vul de naam van het basisspel in." : "";
-        });
+        }
 
         //validatie spelers
-        min_spelers_field.addEventListener("change", function () {
-            min_spelers_error.textContent =
-                min_spelers_field.value === "" ? "Vul min spelers in." : "";
-            checkSpelers();
-        });
-
+        min_spelers_field.addEventListener("change", checkSpelers);
         max_spelers_field.addEventListener("change", checkSpelers);
 
         function checkSpelers() {
-            if (min_spelers_field.value !== "" &&
+            min_spelers_error.textContent = "";
+            max_spelers_error.textContent = "";
+
+            if (min_spelers_field.validity.badInput ||
+                (min_spelers_field.value !== "" && !/^[1-9][0-9]*$/.test(min_spelers_field.value))) {
+                min_spelers_error.textContent = "Ongeldig minimaal aantal spelers.";
+            } else if (type.value === "bordspel" && min_spelers_field.value === "") {
+                min_spelers_error.textContent = "Vul min spelers in.";
+            }
+
+            if (max_spelers_field.validity.badInput ||
+                (max_spelers_field.value !== "" && !/^[1-9][0-9]*$/.test(max_spelers_field.value))) {
+                max_spelers_error.textContent = "Ongeldig maximaal aantal spelers.";
+            } else if (type.value === "bordspel" && max_spelers_field.value === "") {
+                max_spelers_error.textContent = "Vul max spelers in.";
+            }
+
+            if (min_spelers_error.textContent === "" && max_spelers_error.textContent === "" &&
+                min_spelers_field.value !== "" &&
                 max_spelers_field.value !== "" &&
                 Number(max_spelers_field.value) < Number(min_spelers_field.value)) {
 
                 max_spelers_error.textContent =
                     "Max spelers mag niet lager zijn dan min spelers.";
-            } else {
-                max_spelers_error.textContent = "";
             }
         }
 
-        //zelf ingevoerd basisspel ook controleren bij verzenden
+        //validatie foto
+        foto_field.addEventListener("change", checkFoto);
+
+        function checkFoto() {
+            const foto = foto_field.files[0];
+            foto_error.textContent = "";
+
+            if (!foto) {
+                foto_error.textContent = "Kies een foto.";
+            } else if (foto.size > 2 * 1024 * 1024) {
+                foto_error.textContent = "Foto is te groot.";
+            } else if (!["image/jpeg", "image/png", "image/gif"].includes(foto.type)) {
+                foto_error.textContent = "Ongeldig afbeeldingstype.";
+            }
+        }
+
+        //alle velden ook controleren bij verzenden
         document.querySelector("form").addEventListener("submit", function (event) {
-            if (type.value === "uitbreiding" &&
-                basisspelVeld_field.value === "Basisspel niet aanwezig" &&
-                nieuwBasisspel_field.value.trim() === "") {
+            checkTitel();
+            checkBasisspel();
+            checkNieuwBasisspel();
+            checkSpelers();
+            checkFoto();
 
-                nieuwBasisspel_error.textContent =
-                    "Vul de naam van het basisspel in.";
-
+            if (titel_error.textContent !== "" || basisspelVeld_error.textContent !== "" ||
+                nieuwBasisspel_error.textContent !== "" || min_spelers_error.textContent !== "" ||
+                max_spelers_error.textContent !== "" || foto_error.textContent !== "") {
                 event.preventDefault();
             }
         });

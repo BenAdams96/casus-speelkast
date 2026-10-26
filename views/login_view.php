@@ -19,6 +19,10 @@
         <br><br>
 
         <button type="submit">Inloggen</button>
+
+        <?php if ($error !== ""): ?>
+            <p style="color: red"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
     </form>
 
     <p>Nog geen account? <a href="registreren.php">Registreer hier</a></p>

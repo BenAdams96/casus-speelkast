@@ -1,61 +1,28 @@
-# Login en logout
+# Inloggen, registreren en uitloggen
 
-### User Story – Inloggen
-**Als gebruiker** wil ik kunnen inloggen met mijn gebruikersnaam en wachtwoord, zodat ik toegang krijg tot de Speelkast.
+Als gebruiker wil ik kunnen inloggen, zodat ik de gezamenlijke Speelkast kan bekijken en items kan toevoegen.
 
-**Acceptatiecriteria:**
-- Inloggen met gebruikersnaam en wachtwoord.
-- Bij correcte gegevens doorsturen naar `speelkast.php`.
-- Bij onjuiste gegevens een foutmelding tonen.
-- Alleen ingelogde gebruikers kunnen de Speelkast bekijken.
-- Gebruiker kan uitloggen.
+## Samenwerking
 
-### View
-**`views/login_view.php`**
-- Formulier met gebruikersnaam en wachtwoord.
-- Versturen via POST.
-- Eventuele foutmelding tonen.
+1. `index.php` start de session en vraagt PDO op via `DBConnect::getInstance()`.
+2. Het startscript geeft PDO aan `UserManager` en geeft die manager aan `AuthController`.
+3. `AuthController::login()` toont bij GET het formulier uit `views/login_view.php`.
+4. Bij POST haalt `UserManager::getUser()` de gebruiker op met een prepared statement. De controller controleert het wachtwoord met `password_verify()`.
+5. Bij succes wordt het session-ID vernieuwd. `user_id` en `username` worden in de session opgeslagen en de browser gaat naar `speelkast.php`.
+6. Beschermde startscripts sturen een bezoeker zonder `user_id` terug naar `index.php`.
 
-**`views/speelkast_view.php`**
-- Uitlogknop via POST.
+## Registreren
 
-### Controller
-**`controllers/AuthController.php`**
+`registreren.php` roept `AuthController::register()` aan. De controller controleert of gebruikersnaam en wachtwoord zijn ingevuld. `UserManager::registerUser()` maakt een hash met `password_hash()` en slaat de gebruiker op met een prepared statement. Daarna gaat de browser terug naar de loginpagina.
 
-Verwerkt het inloggen en uitloggen.
+## Uitloggen
 
-**Methodes:**
-- `login()` – controleert POST, haalt gebruiker op via `UserManager`, vergelijkt wachtwoord en slaat `user_id` op in `$_SESSION`. Bij succes redirect naar `speelkast.php`, anders foutmelding tonen via de View.
-- `logout()` – controleert of via POST is uitgelogd, vernietigt de session en verwijst terug naar `index.php`.
+Het overzicht verstuurt een POST met `logout`. `AuthController::logout()` maakt `$_SESSION` leeg, vernietigt de session en stuurt terug naar `index.php`.
 
-### Model
-**`models/UserManager.php`**
-- Ontvangt PDO via de constructor (dependency injection).
-- Zoekt gebruiker op via een prepared statement.
+## Huidige aandachtspunten
 
-**Methodes:**
-- `__construct($pdo)`
-- `getUser($username)` – haalt gebruiker op uit MySQL.
+- De logincontroller maakt bij een mislukte login een foutmelding; `login_view.php` toont deze onder de inlogknop.
+- De databaseconfiguratie wordt uit `.env` gelezen en wachtwoorden worden gehasht.
+- Voor een nieuwe installatie worden accounts via registratie aangemaakt; er is geen seed met vaste inloggegevens.
 
-### Databaseverbinding
-**`database/DBConnect.php`**
-- Maakt verbinding met MySQL via PDO.
-- Gebruikt try/catch voor verbindingsfouten.
-- `getInstance()` – geeft de PDO-verbinding terug.
-
-### Startpagina's
-- `index.php` – start session, maakt benodigde objecten en roept `login()` aan.
-- `speelkast.php` – controleert de session, verwerkt eventueel uitloggen en toont de Speelkast.
-
-### Database
-**MySQL – tabel `user`**
-
-| Kolom | Type |
-|---|---|
-| id | INT, PRIMARY KEY, AUTO_INCREMENT |
-| username | VARCHAR |
-| password | VARCHAR |
-
-**Nog aanpassen:**
-- Wachtwoorden hashen en controleren met `password_verify()`.
-- Databasegegevens naar een configuratiebestand verplaatsen.
+Zie de [README](README.md) voor installatie, de databasetabellen en alle diagrammen.
