@@ -39,7 +39,7 @@ class ItemManager
         throw new InvalidArgumentException("Ongeldig speltype.");
     }
 
-    public function getAllItems()
+    public function getAllItems(): array
     {
         $stmt = $this->pdo->query(
             "SELECT items.*, user.username
@@ -48,26 +48,45 @@ class ItemManager
         );
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $items = [];
 
-        //iedere database-rij omzetten naar een object
+        $items = [];
+        $bordspellen = [];
+
         foreach ($rows as $row) {
-            $items[] = $this->createItem($row);
+            $item = $this->createItem($row);
+            $items[] = $item;
+
+            //bordspellen opslaan in associative array (gebruik maken van een hashmap)
+            //deed eerst nested forloop, dat was O(N^2), nu met hashmap O(N)
+            if ($item instanceof BoardGame) {
+                $naam = strtolower(trim($item->getTitel()));
+                $bordspellen[$naam] = $item;
+            }
+        }
+
+        //uitbreidingen koppelen aan basisspellen
+        foreach ($items as $item) {
+            if ($item instanceof Expansion) {
+                $naam = strtolower(trim($item->getBasisspel()));
+
+                if (isset($bordspellen[$naam])) {
+                    $bordspellen[$naam]->addUitbreiding($item->getTitel());
+                }
+            }
         }
 
         return $items;
     }
 
-    public function addItem(KastItem $item, int $userId)
+    public function addItem(KastItem $item, int $userId): bool
     {
         $stmt = $this->pdo->prepare(
             "INSERT INTO items
-        (user_id, type, titel, image_path, min_spelers, max_spelers, basisspel)
-        VALUES
-        (:user_id, :type, :titel, :image_path, :min_spelers, :max_spelers, :basisspel)"
+             (user_id, type, titel, image_path, min_spelers, max_spelers, basisspel)
+             VALUES
+             (:user_id, :type, :titel, :image_path, :min_spelers, :max_spelers, :basisspel)"
         );
 
-        //gegevens uit het object ophalen
         return $stmt->execute([
             "user_id" => $userId,
             "type" => $item->getType()->value,
@@ -78,5 +97,4 @@ class ItemManager
             "basisspel" => $item instanceof Expansion ? $item->getBasisspel() : null
         ]);
     }
-
 }

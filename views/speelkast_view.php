@@ -28,18 +28,15 @@
 
     <?php foreach ($items as $item): ?>
         <div class="spel">
-
             <h3><?= htmlspecialchars($item->getTitel()) ?></h3>
 
             <div class="spel-inhoud">
-
                 <div>
                     <?= $item->showImage() ?>
                 </div>
 
                 <div>
                     <p><strong>Eigenaar:</strong> <?= htmlspecialchars($item->getUsername()) ?></p>
-
                     <p><strong>Type:</strong> <?= htmlspecialchars($item->getType()->value) ?></p>
 
                     <?php if ($item->getMinSpelers() !== null && $item->getMaxSpelers() !== null): ?>
@@ -48,11 +45,10 @@
                         <p><strong>Aantal spelers:</strong> onbekend</p>
                     <?php endif; ?>
 
-                    <?php if ($item instanceof Expansion): ?>
-                        <p><strong>Extra informatie:</strong> <?= htmlspecialchars($item->omschrijving()) ?></p>
+                    <p><strong>Extra informatie:</strong> <?= htmlspecialchars($item->omschrijving()) ?></p>
 
+                    <?php if ($item instanceof Expansion): ?>
                         <?php
-                        //controleren of het basisspel in de speelkast staat
                         $basisspelBestaat = false;
 
                         foreach ($items as $anderItem) {
@@ -71,7 +67,6 @@
                                 Let op: het basisspel staat niet in de Speelkast.
                             </p>
                         <?php endif; ?>
-
                     <?php endif; ?>
 
                 </div>

@@ -226,7 +226,7 @@ require_once "models/enums/ItemType.php";
 
             if (!foto) {
                 foto_error.textContent = "Kies een foto.";
-            } else if (foto.size > 2 * 1024 * 1024) {
+            } else if (foto.size > 2 * 1024 * 1024) { //groter dan 2MB
                 foto_error.textContent = "Foto is te groot.";
             } else if (!["image/jpeg", "image/png", "image/gif"].includes(foto.type)) {
                 foto_error.textContent = "Ongeldig afbeeldingstype.";
