@@ -11,14 +11,30 @@ class SpeelkastController
         $this->opslag = $opslag;
     }
 
-    public function showItems()
+    public function showItems(): void
     {
+        //controleren of er een spel verwijderd moet worden
+        if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["verwijderen"])) {
+
+            $itemId = (int) ($_POST["item_id"] ?? 0);
+            $userId = $_SESSION["user_id"];
+
+            //spel verwijderen als het van de ingelogde gebruiker is
+            if ($itemId > 0) {
+                $this->itemManager->deleteItem($itemId, $userId);
+            }
+
+            header("Location: speelkast.php");
+            exit;
+        }
+
+        //alle spellen tonen
         $items = $this->itemManager->getAllItems();
 
         require "views/speelkast_view.php";
     }
 
-    public function toevoegen()
+    public function toevoegen(): void
     {
         $error = "";
 
@@ -41,15 +57,13 @@ class SpeelkastController
                 $error = $e->getMessage();
             }
         }
+
         $items = $this->itemManager->getAllItems();
         require "views/toevoegen_view.php";
     }
 
-
-    // Server side checking whether the form is filled in correctly.
     private function getFormulierData(): array
     {
-        //formuliergegevens ophalen
         $type = $_POST["type"] ?? "";
         $titel = trim($_POST["titel"] ?? "");
         $basisspel = trim($_POST["basisspel"] ?? "");
@@ -58,6 +72,7 @@ class SpeelkastController
         if ($basisspel === "Basisspel niet aanwezig") {
             $basisspel = trim($_POST["nieuw_basisspel"] ?? "");
         }
+
         $minSpelers = $_POST["min_spelers"] ?? "";
         $maxSpelers = $_POST["max_spelers"] ?? "";
 
@@ -86,7 +101,7 @@ class SpeelkastController
             }
         }
 
-        //controleren of ingevulde spelersaantallen positieve gehele getallen zijn
+        //spelersaantallen valideren
         if ($minSpelers !== "" && !preg_match("/^[1-9][0-9]*$/", $minSpelers)) {
             throw new Exception("Ongeldig minimaal aantal spelers.");
         }
@@ -95,22 +110,13 @@ class SpeelkastController
             throw new Exception("Ongeldig maximaal aantal spelers.");
         }
 
-        //lege spelersaantallen omzetten naar null
-        if ($minSpelers === "") {
-            $minSpelers = null;
-        } else {
-            $minSpelers = (int) $minSpelers;
-        }
+        //lege waarden omzetten naar null
+        $minSpelers = $minSpelers === "" ? null : (int) $minSpelers;
+        $maxSpelers = $maxSpelers === "" ? null : (int) $maxSpelers;
 
-        if ($maxSpelers === "") {
-            $maxSpelers = null;
-        } else {
-            $maxSpelers = (int) $maxSpelers;
-        }
-
-        //maximaal mag niet kleiner zijn dan minimaal
         if (
-            $minSpelers !== null && $maxSpelers !== null &&
+            $minSpelers !== null &&
+            $maxSpelers !== null &&
             $maxSpelers < $minSpelers
         ) {
             throw new Exception("Max spelers mag niet lager zijn dan min spelers.");
@@ -126,12 +132,12 @@ class SpeelkastController
         ];
     }
 
-    public function exportXml()
+
+    public function exportXml(): void
     {
-        //spellen uit database ophalen
+        //spellen ophalen en XML maken
         $items = $this->itemManager->getAllItems();
 
-        //spellen omzetten naar XML
         $exporter = new XmlExporter();
         $xml = $exporter->createXml($items);
 
@@ -141,7 +147,63 @@ class SpeelkastController
         $dom->loadXML($xml);
         $xml = $dom->saveXML();
 
-        //XML downloaden als op download is geklikt
+        //volledige Speelkast downloaden als ZIP
+
+        if (isset($_GET["zip"])) {
+
+            $zipBestand = tempnam(sys_get_temp_dir(), "speelkast_");
+
+            if ($zipBestand === false) {
+                die("Kon geen tijdelijk bestand maken.");
+            }
+
+            $zip = new ZipArchive();
+
+            if ($zip->open($zipBestand, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                die("Kon ZIP-bestand niet openen.");
+            }
+
+            //XML toevoegen
+            $zip->addFromString("speelkast.xml", $xml);
+
+            //foto's toevoegen
+            foreach ($items as $item) {
+                $bestandsnaam = basename($item->getImagePath());
+                $fotoPad = __DIR__ . "/../upload/" . $bestandsnaam;
+
+                if (is_file($fotoPad)) {
+                    $zip->addFile($fotoPad, "upload/" . $bestandsnaam);
+                }
+            }
+
+            //controleren of ZIP succesvol is gemaakt
+            if (!$zip->close()) {
+                die("ZIP-bestand kon niet worden opgeslagen.");
+            }
+
+            clearstatcache(true, $zipBestand);
+
+            if (!is_file($zipBestand) || filesize($zipBestand) === 0) {
+                die("ZIP-bestand is leeg of bestaat niet.");
+            }
+
+            //eventuele eerdere uitvoer verwijderen
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            //ZIP downloaden
+            header("Content-Type: application/zip");
+            header('Content-Disposition: attachment; filename="speelkast.zip"');
+            header("Content-Length: " . filesize($zipBestand));
+
+            readfile($zipBestand);
+            unlink($zipBestand);
+            exit;
+        }
+
+
+        //alleen XML downloaden
         if (isset($_GET["download"])) {
             header("Content-Type: application/xml; charset=UTF-8");
             header('Content-Disposition: attachment; filename="speelkast.xml"');
@@ -150,48 +212,41 @@ class SpeelkastController
             exit;
         }
 
-        //anders de exportpagina tonen
+        //exportpagina tonen
         require "views/export_view.php";
     }
 
 
-
-    public function showAvondlijst()
+    public function showAvondlijst(): void
     {
-        //spellen ophalen en XML maken
         $items = $this->itemManager->getAllItems();
 
         $exporter = new XmlExporter();
         $xml = $exporter->createXml($items);
 
-        //tijdelijk testen met ongeldig speltype
-        // $xml = str_replace("<type>bordspel</type>", "<type>ongeldig</type>", $xml);
-
-        //XML-string laden in DOMDocument
         $dom = new DOMDocument();
         $dom->loadXML($xml);
 
-        //XML controleren met XSD
+        //XML valideren
         libxml_use_internal_errors(true);
         $isValid = $dom->schemaValidate(__DIR__ . "/../speelkast.xsd");
         libxml_clear_errors();
         libxml_use_internal_errors(false);
 
-        //XSLT-bestand laden
+        //XSLT laden
         $xslt = new DOMDocument();
         $xslt->load(__DIR__ . "/../avondlijst.xslt");
 
-        //XML omzetten naar HTML met XSLT
         $processor = new XSLTProcessor();
         $processor->importStylesheet($xslt);
 
-        //validatieresultaat doorgeven aan XSLT
-        $validatie = $isValid ? "XML is geldig volgens XSD." : "XML is niet geldig volgens XSD.";
+        $validatie = $isValid
+            ? "XML is geldig volgens XSD."
+            : "XML is niet geldig volgens XSD.";
+
         $processor->setParameter("", "validatie", $validatie);
 
-        //HTML tonen in browser
         header("Content-Type: text/html; charset=UTF-8");
         echo $processor->transformToXML($dom);
     }
-
 }

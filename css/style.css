@@ -19,6 +19,7 @@
 }
 
 body {
+    min-width: 850px;
     max-width: 1100px;
     margin: 0 auto;
     padding: 32px 24px;
@@ -60,7 +61,7 @@ a:hover {
 
 /* Knoppen */
 button {
-    background: var(--primary);
+    background-color: var(--primary);
     color: white;
     border: none;
     border-radius: 7px;
@@ -69,11 +70,11 @@ button {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background-color 0.15s;
 }
 
 button:hover {
-    background: var(--primary-hover);
+    background-color: var(--primary-hover);
 }
 
 button + button {
@@ -86,12 +87,23 @@ button + button {
     justify-content: space-between;
     align-items: center;
     gap: 15px;
-    flex-wrap: wrap;
+
     background: white;
     padding: 16px 20px;
     border: 1px solid var(--border);
     border-radius: 10px;
     margin-bottom: 28px;
+}
+
+.topbar form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.topbar button {
+    margin: 0;
 }
 
 /* Spelkaarten */
@@ -110,13 +122,23 @@ button + button {
     margin-bottom: 16px;
 }
 
+/* Indeling: foto links, informatie midden, knop rechts */
 .spel-inhoud {
-    display: flex;
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) max-content;
+    grid-template-areas: "foto informatie acties";
     align-items: center;
-    gap: 24px;
+    column-gap: 24px;
+    width: 100%;
 }
 
-.spel-inhoud img {
+/* Foto links */
+.spel-foto {
+    grid-area: foto;
+}
+
+.spel-foto img {
+    display: block;
     width: 140px;
     height: 140px;
     object-fit: contain;
@@ -124,25 +146,60 @@ button + button {
     background: #f4f5f8;
 }
 
-.spel-inhoud p {
-    margin: 0 0 7px;
-    font-size: 14px;
+/* Informatie in het midden */
+.spel-info {
+    grid-area: informatie;
+    min-width: 0;
 }
 
-.spel-inhoud p:last-child {
+.spel-info p {
+    margin: 0 0 7px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.spel-info p:last-child {
     margin-bottom: 0;
 }
 
-/* Formulieren (login, registratie, toevoegen) */
+/* Acties helemaal rechts en verticaal gecentreerd */
+.spel-acties {
+    grid-area: acties;
+    justify-self: end;
+    align-self: center;
+}
+
+.spel-acties form {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    box-shadow: none;
+}
+
+/* Rode verwijderknop */
+.spel-acties button.verwijder-knop {
+    background-color: #b83232;
+    color: white;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.spel-acties button.verwijder-knop:hover {
+    background-color: #922626;
+}
+
+/* Formulieren: login, registratie, toevoegen */
 body > form {
     background: white;
     max-width: 720px;
     padding: 24px 28px;
     border: 1px solid var(--border);
     border-radius: 10px;
+    margin-top: 20px;
 }
 
-/* De bestaande HTML gebruikt nog br-br voor afstanden */
+/* Oude br-tags geen extra ruimte geven */
 body > form > br {
     display: none;
 }
@@ -154,39 +211,65 @@ body > form label {
     margin: 14px 0 5px;
 }
 
-/* Invoerveld en foutmelding naast elkaar */
-body > form input:not([type="hidden"]):not([type="submit"]),
-body > form select {
-    display: inline-block;
+/* Invoervelden */
+body > form > input:not([type="hidden"]):not([type="submit"]),
+body > form > select,
+body > form > textarea {
     width: min(100%, 300px);
     padding: 9px 11px;
-    margin: 0;
     border: 1px solid #cfd6e2;
     border-radius: 6px;
     background: white;
     font: inherit;
     font-size: 14px;
-    vertical-align: middle;
+    margin: 0 0 6px;
 }
 
-body > form input:focus,
-body > form select:focus {
+/* Invoerveld en foutmelding naast elkaar */
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.input-row input,
+.input-row select {
+    flex: 0 1 300px;
+    width: 300px;
+    min-width: 0;
+    padding: 9px 11px;
+    border: 1px solid #cfd6e2;
+    border-radius: 6px;
+    background: white;
+    font: inherit;
+    font-size: 14px;
+    margin: 0;
+}
+
+.input-row input[type="file"] {
+    padding: 8px;
+}
+
+.input-row span {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: #c02f37;
+}
+
+/* Focus bij invoervelden */
+input:focus,
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(52, 72, 165, 0.09);
 }
 
-/* JS-foutmeldingen naast de velden */
-body > form span[id$="_error"] {
-    display: inline;
-    margin-left: 10px;
-    font-size: 12px;
-    color: #c02f37;
-    vertical-align: middle;
-}
-
+/* Formulierknoppen */
 body > form button[type="submit"] {
-    margin-top: 20px;
+    margin-top: 18px;
 }
 
 /* XML-export */
@@ -237,54 +320,4 @@ td img {
 
 td p {
     margin: 5px 0;
-}
-
-/* Kleinere schermen */
-@media (max-width: 650px) {
-    body {
-        padding: 18px 12px;
-    }
-
-    .spel-inhoud {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    body > form {
-        padding: 18px;
-    }
-
-    body > form input:not([type="hidden"]):not([type="submit"]),
-    body > form select {
-        width: 100%;
-    }
-
-    body > form span[id$="_error"] {
-        display: block;
-        margin-left: 0;
-        margin-top: 5px;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-    }
-    .input-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .input-row input,
-    .input-row select {
-        flex: 0 1 300px;
-        min-width: 0;
-        margin: 0;
-    }
-
-    .input-row span {
-        flex: 1;
-        margin: 0;
-        font-size: 13px;
-    }
 }

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 
@@ -8,19 +9,23 @@
 </head>
 
 <body>
-    <h1>XML exporteren</h1>
+    <h1>Speelkast exporteren</h1>
 
     <a href="speelkast.php">Terug naar Speelkast</a>
 
-    <p>Hieronder staan alle spellen uit de database in XML-formaat.</p>
+    <p>Exporteer de spellen als XML of download de volledige Speelkast inclusief foto's.</p>
 
     <button type="button" onclick="window.location.href='export.php?download=1'">
         Download XML
     </button>
 
+    <button type="button" onclick="window.location.href='export.php?zip=1'">
+        Download volledige Speelkast (ZIP)
+    </button>
+
     <h2>XML-overzicht</h2>
 
-    <pre><?= htmlspecialchars($xml) ?></pre>
+    <pre><?= htmlspecialchars($xml, ENT_QUOTES, "UTF-8") ?></pre>
 
 </body>
 

@@ -1,3 +1,4 @@
+
 <?php
 
 require_once __DIR__ . "/BoardGame.php";
@@ -43,8 +44,8 @@ class ItemManager
     {
         $stmt = $this->pdo->query(
             "SELECT items.*, user.username
-         FROM items
-         JOIN user ON items.user_id = user.id"
+             FROM items
+             JOIN user ON items.user_id = user.id"
         );
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,17 +55,18 @@ class ItemManager
 
         foreach ($rows as $row) {
             $item = $this->createItem($row);
-            $items[] = $item;
 
-            //bordspellen opslaan in associative array (gebruik maken van een hashmap)
-            //deed eerst nested forloop, dat was O(N^2), nu met hashmap O(N)
+            //database-ID als sleutel gebruiken
+            $items[(int) $row["id"]] = $item;
+
+            //bordspellen indexeren met een hashmap
             if ($item instanceof BoardGame) {
                 $naam = strtolower(trim($item->getTitel()));
                 $bordspellen[$naam] = $item;
             }
         }
 
-        //uitbreidingen koppelen aan basisspellen
+        //uitbreidingen aan basisspellen koppelen
         foreach ($items as $item) {
             if ($item instanceof Expansion) {
                 $naam = strtolower(trim($item->getBasisspel()));
@@ -96,5 +98,21 @@ class ItemManager
             "max_spelers" => $item->getMaxSpelers(),
             "basisspel" => $item instanceof Expansion ? $item->getBasisspel() : null
         ]);
+    }
+
+    public function deleteItem(int $itemId, int $userId): bool
+    {
+        //alleen verwijderen als de ingelogde gebruiker eigenaar is
+        $stmt = $this->pdo->prepare(
+            "DELETE FROM items
+             WHERE id = :id AND user_id = :user_id"
+        );
+
+        $stmt->execute([
+            "id" => $itemId,
+            "user_id" => $userId
+        ]);
+
+        return $stmt->rowCount() === 1;
     }
 }
