@@ -321,3 +321,11 @@ td img {
 td p {
     margin: 5px 0;
 }
+
+
+/* Uitbreidingen onder hun basisspel weergeven */
+.spel.uitbreiding {
+    margin-left: 35px;
+    border-left: 4px solid #3448a5;
+    background-color: #f0f3fc;
+}

@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>De Speelkast</title>
-    <link rel="stylesheet" href="css/style.css?v=5">
+    <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 
 <body>
@@ -26,8 +26,81 @@
 
     <h2>Spellenoverzicht</h2>
 
-    <?php foreach ($items as $itemId => $item): ?>
-        <div class="spel">
+    <?php
+    //splits basisspellen en uitbreidingen
+    $basisspellen = [];
+    $uitbreidingen = [];
+
+    foreach ($items as $itemId => $item) {
+        if ($item instanceof Expansion) {
+            $uitbreidingen[$itemId] = $item;
+        } else {
+            $basisspellen[$itemId] = $item;
+        }
+    }
+
+    //sorteer beide groepen alfabetisch
+    uasort($basisspellen, function ($a, $b) {
+        return strcasecmp($a->getTitel(), $b->getTitel());
+    });
+
+    uasort($uitbreidingen, function ($a, $b) {
+        return strcasecmp($a->getTitel(), $b->getTitel());
+    });
+
+    //maak een nieuwe lijst met uitbreidingen onder hun basisspel
+    $gesorteerdeItems = [];
+
+    foreach ($basisspellen as $itemId => $basisspel) {
+
+        //voeg eerst het basisspel toe
+        $gesorteerdeItems[$itemId] = $basisspel;
+
+        //zoek bijbehorende uitbreidingen
+        foreach ($uitbreidingen as $uitbreidingId => $uitbreiding) {
+
+            if (
+                strcasecmp(
+                    trim($basisspel->getTitel()),
+                    trim($uitbreiding->getBasisspel())
+                ) === 0
+            ) {
+                $gesorteerdeItems[$uitbreidingId] = $uitbreiding;
+
+                //deze uitbreiding is al toegevoegd
+                unset($uitbreidingen[$uitbreidingId]);
+            }
+        }
+    }
+
+    //uitbreidingen zonder basisspel komen onderaan
+    foreach ($uitbreidingen as $itemId => $uitbreiding) {
+        $gesorteerdeItems[$itemId] = $uitbreiding;
+    }
+    ?>
+
+    <?php foreach ($gesorteerdeItems as $itemId => $item): ?>
+
+        <?php
+        //controleren of het basisspel aanwezig is
+        $basisspelBestaat = false;
+
+        if ($item instanceof Expansion) {
+            foreach ($basisspellen as $basisspel) {
+                if (
+                    strcasecmp(
+                        trim($basisspel->getTitel()),
+                        trim($item->getBasisspel())
+                    ) === 0
+                ) {
+                    $basisspelBestaat = true;
+                    break;
+                }
+            }
+        }
+        ?>
+
+        <div class="spel <?= $basisspelBestaat ? 'uitbreiding' : '' ?>">
 
             <h3><?= htmlspecialchars($item->getTitel()) ?></h3>
 
@@ -65,35 +138,16 @@
                         <?= htmlspecialchars($item->omschrijving()) ?>
                     </p>
 
-                    <!-- Controleren of het basisspel aanwezig is -->
-                    <?php if ($item instanceof Expansion): ?>
-                        <?php
-                        $basisspelBestaat = false;
-
-                        foreach ($items as $anderItem) {
-                            if (
-                                $anderItem instanceof BoardGame &&
-                                strcasecmp(
-                                    trim($anderItem->getTitel()),
-                                    trim($item->getBasisspel())
-                                ) === 0
-                            ) {
-                                $basisspelBestaat = true;
-                                break;
-                            }
-                        }
-                        ?>
-
-                        <?php if (!$basisspelBestaat): ?>
-                            <p style="color: red;">
-                                Let op: het basisspel staat niet in de Speelkast.
-                            </p>
-                        <?php endif; ?>
+                    <!-- Waarschuwing bij ontbrekend basisspel -->
+                    <?php if ($item instanceof Expansion && !$basisspelBestaat): ?>
+                        <p style="color: red;">
+                            Let op: het basisspel staat niet in de Speelkast.
+                        </p>
                     <?php endif; ?>
 
                 </div>
 
-                <!-- Verwijderknop rechts, alleen bij eigen spellen -->
+                <!-- Verwijderknop alleen voor de eigenaar -->
                 <?php if ($item->getUsername() === $_SESSION["username"]): ?>
                     <div class="spel-acties">
 
@@ -113,6 +167,7 @@
 
             </div>
         </div>
+
     <?php endforeach; ?>
 
 </body>
